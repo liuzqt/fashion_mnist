@@ -70,6 +70,7 @@ class DataSet(object):
         if self.pos == self.train_size:
             self.epoch += 1
             np.random.shuffle(self.shuffle_index)
+            self.pos = 0
         return data, label
 
     def valid_batch(self):
