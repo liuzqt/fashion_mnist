@@ -29,6 +29,8 @@ class Runner(object):
         self.model = None
         if not os.path.exists(self.config.model_path):
             os.mkdir(self.config.model_path)
+        for key in config.__dict__:
+            print(key, config.__dict__[key])
 
     def run(self):
         with self.graph.as_default(), tf.Session() as sess:
@@ -67,8 +69,9 @@ class Runner(object):
                     feed_dict={self.model.input: data,
                                self.model.label: label})
                 if step % 50 == 0:
-                    print('step %d, epoch %d, loss %f' % (step,self.dataset.epoch, loss))
-                if (step ) % self.config.valid_step == 0:
+                    print('step %d, epoch %d, loss %f' % (
+                    step, self.dataset.epoch, loss))
+                if (step) % self.config.valid_step == 0:
                     valid_data, valid_label = self.dataset.valid_batch()
                     accu = sess.run(self.model.accuracy,
                                     feed_dict={self.model.input: valid_data,

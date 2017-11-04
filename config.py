@@ -21,12 +21,13 @@ class Config(object):
     def __init__(self):
         self.batch_size = 50
         self.valid_size = 1000
-        self.learning_rate = 1.5e-4
+        self.learning_rate = 1e-3
         self.max_epoch = 10
         self.valid_step = 600
-        self.initializer = 'xavier'
+        self.initializer = 'normal'
+        self.activate_func = 'relu' # sigmoid or relu
 
-        self.dropout = False
+        self.dropout = True
         self.keep_prob = 0.6
 
         self.use_lr_decay = True

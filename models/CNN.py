@@ -20,7 +20,16 @@ class CNN(object):
         if config.initializer == 'xavier':
             self.initializer = tf.contrib.layers.xavier_initializer_conv2d()
         else:
-            self.initializer = tf.truncated_normal_initializer
+            self.initializer = tf.truncated_normal_initializer(stddev=0.1)
+
+        if config.activate_func == 'sigmoid':
+            self.activate_func = tf.nn.sigmoid
+        elif config.activate_func == 'relu':
+            self.activate_func = tf.nn.relu
+        elif config.activate_func == 'tanh':
+            self.activate_func = tf.nn.tanh
+        else:
+            raise Exception('activation function not defined!')
 
         self.input = tf.placeholder(tf.float32, [None, 28, 28], name='input')
         self._input = tf.expand_dims(self.input, 3)
@@ -32,7 +41,7 @@ class CNN(object):
         self.conv1_b = tf.get_variable("conv1_b", [32], tf.float32,
                                        initializer=tf.zeros_initializer
                                        )
-        self.h1_conv = tf.nn.sigmoid(
+        self.h1_conv = self.activate_func(
             self.conv2d(self._input, self.conv1_w) + self.conv1_b, 'hidden1')
         self.h1 = self.max_pool_2x2(self.h1_conv, 'pooling1')
 
@@ -42,7 +51,7 @@ class CNN(object):
         self.conv2_b = tf.get_variable("conv2_b", [64], tf.float32,
                                        tf.zeros_initializer)
 
-        self.h2_conv = tf.nn.sigmoid(
+        self.h2_conv = self.activate_func(
             self.conv2d(self.h1, self.conv2_w) + self.conv2_b, 'hidden2')
         self.h2 = self.max_pool_2x2(self.h2_conv, 'pooling2')
 
@@ -53,7 +62,7 @@ class CNN(object):
                                      self.initializer)
         self.fc1_b = tf.get_variable('fc1_b', [1024], tf.float32,
                                      tf.zeros_initializer)
-        self.fc1 = tf.sigmoid(tf.matmul(self.flatten, self.fc1_w) + self.fc1_b,
+        self.fc1 = self.activate_func(tf.matmul(self.flatten, self.fc1_w) + self.fc1_b,
                               'fc1')
 
         # dropout
@@ -67,7 +76,7 @@ class CNN(object):
                                      self.initializer)
         self.fc2_b = tf.get_variable('fc2_b', [10], tf.float32,
                                      tf.zeros_initializer)
-        self.fc2 = tf.sigmoid(tf.matmul(self.fc1, self.fc2_w) + self.fc2_b,
+        self.fc2 = self.activate_func(tf.matmul(self.fc1, self.fc2_w) + self.fc2_b,
                               'fc2')
         self.softmax = tf.nn.softmax(logits=self.fc2, name='softmax')
 
@@ -86,7 +95,8 @@ class CNN(object):
         self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
 
         self.loss = -tf.reduce_sum(self.label * tf.log(self.softmax))
-        self.train_op = self.optimizer.minimize(self.loss,global_step=self.global_step)
+        self.train_op = self.optimizer.minimize(self.loss,
+                                                global_step=self.global_step)
 
     def conv2d(self, x, W):
         return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
