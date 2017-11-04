@@ -31,10 +31,12 @@ class Runner(object):
             os.mkdir(self.config.model_path)
         for key in config.__dict__:
             print(key, config.__dict__[key])
+        with self.graph.as_default():
+            self.model = CNN(self.config)
+            tf.Graph.finalize(self.graph)
 
     def run(self):
         with self.graph.as_default(), tf.Session() as sess:
-            self.model = CNN(self.config)
 
             model_path = os.path.join(self.config.model_path,
                                       self.config.model_name)
@@ -48,7 +50,6 @@ class Runner(object):
                 print("Model doesn't exist.\nInitializing........")
                 sess.run(tf.global_variables_initializer())
             sess.run(tf.local_variables_initializer())
-            tf.Graph.finalize(self.graph)
 
             def handler_stop_signals(signum, frame):
 
@@ -70,7 +71,7 @@ class Runner(object):
                                self.model.label: label})
                 if step % 50 == 0:
                     print('step %d, epoch %d, loss %f' % (
-                    step, self.dataset.epoch, loss))
+                        step, self.dataset.epoch, loss))
                 if (step) % self.config.valid_step == 0:
                     valid_data, valid_label = self.dataset.valid_batch()
                     accu = sess.run(self.model.accuracy,
@@ -78,10 +79,10 @@ class Runner(object):
                                                self.model.label: valid_label})
                     print('valid accuracy: %f' % accu)
 
+            saver.save(sess, save_path=model_path)
             print(
                 'training finished,  the model will be save in %s' % (
                     self.config.model_path))
-            saver.save(sess, save_path=model_path)
             self.test()
 
     def test(self):
