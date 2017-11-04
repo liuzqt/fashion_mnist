@@ -27,6 +27,8 @@ class Runner(object):
         self.dataset = read_dataset(config.batch_size)
         self.graph = tf.Graph()
         self.model = None
+        if not os.path.exists(self.config.model_path):
+            os.mkdir(self.config.model_path)
 
     def run(self):
         with self.graph.as_default(), tf.Session() as sess:
