@@ -78,7 +78,7 @@ class Runner(object):
                                     feed_dict={self.model.input: valid_data,
                                                self.model.label: valid_label})
                     print('valid accuracy: %f' % accu)
-
+            self._test(sess)
             saver.save(sess, save_path=model_path)
             print(
                 'training finished,  the model will be save in %s' % (
@@ -88,20 +88,21 @@ class Runner(object):
         with self.graph.as_default(), tf.Session() as sess:
             files = glob(os.path.join(self.config.model_path, '*.ckpt.*'))
             assert len(files) > 0
-            if not self.restore:
-                saver = tf.train.Saver()
-                saver.restore(sess, os.path.join(self.config.model_path,
-                                                 self.config.model_name))
-                print(('Model restored from:' + self.config.model_path))
-            test_data, test_label = self.dataset.test_batch()
-            accu,sf = sess.run([self.model.accuracy,self.model.softmax],
-                            feed_dict={self.model.input: test_data,
-                                       self.model.label: test_label})
-            print(len(sf))
-            print('test accuracy:%f' % accu)
+            saver = tf.train.Saver()
+            saver.restore(sess, os.path.join(self.config.model_path,
+                                             self.config.model_name))
+            print(('Model restored from:' + self.config.model_path))
+            self._test(sess)
+
+    def _test(self, sess):
+        test_data, test_label = self.dataset.test_batch()
+        accu = sess.run(self.model.accuracy,
+                        feed_dict={self.model.input: test_data,
+                                   self.model.label: test_label})
+        print('test accuracy:%f' % accu)
 
 
 if __name__ == '__main__':
     runner = Runner(get_config())
     runner.run()
-    runner.test()
+    # runner.test()

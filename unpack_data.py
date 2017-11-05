@@ -78,6 +78,11 @@ def run():
     test_images = decode_idx3_ubyte(test_images_idx3_ubyte_file)
     test_labels = decode_idx1_ubyte(test_labels_idx1_ubyte_file)
 
+    perm = np.arange(0, len(train_images))
+    np.random.shuffle(perm)
+    train_images = train_images[perm]
+    train_labels = train_labels[perm]
+
     np.save('./data/train_data.npy', train_images)
     np.save('./data/train_label.npy', train_labels)
     np.save('./data/test_data.npy', test_images)

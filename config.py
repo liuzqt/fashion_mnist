@@ -22,7 +22,7 @@ class Config(object):
         self.batch_size = 50
         self.valid_size = 1000
         self.learning_rate = 1e-3
-        self.max_epoch = 10
+        self.max_epoch = 40
         self.valid_step = 600
         self.initializer = 'normal'
         self.activate_func = 'tanh' # sigmoid or relu
@@ -31,8 +31,8 @@ class Config(object):
         self.keep_prob = 0.6
 
         self.use_lr_decay = True
-        self.lr_decay = 0.8
-        self.decay_step = 3000
+        self.lr_decay = 0.85
+        self.decay_step = 1200
 
         self.model_path = './trained_model/'
         self.model_name = 'latest.ckpt'

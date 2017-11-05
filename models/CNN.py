@@ -36,10 +36,6 @@ class CNN(object):
         self.label = tf.placeholder(tf.float32, [None, 10], name='label')
 
         # first conv+pooling
-        tf.layers.conv2d(inputs=self._input, filters=32, kernel_size=[5, 5],
-                         strides=(1, 1), padding='SAME', use_bias=True,
-                         kernel_initializer=self.initializer)
-
         self.h1_conv = tf.layers.conv2d(self._input, 32, [5, 5],
                                         strides=(1, 1), padding='SAME',
                                         use_bias=True,
@@ -50,7 +46,7 @@ class CNN(object):
                                           name='pooling1')
 
         # second conv+pooling
-        self.h2_conv = tf.layers.conv2d(self._input, 64, [5, 5],
+        self.h2_conv = tf.layers.conv2d(self.h1, 64, [5, 5],
                                         strides=(1, 1), padding='SAME',
                                         use_bias=True,
                                         kernel_initializer=self.initializer,
@@ -76,7 +72,7 @@ class CNN(object):
 
         self.fc2 = tf.layers.dense(self.fc1, 10,
                                    kernel_initializer=self.initializer,
-                                   name='fc1')
+                                   name='fc2')
         self.softmax = tf.nn.softmax(logits=self.fc2, name='softmax')
 
         self.accuracy = tf.reduce_mean(tf.cast(
