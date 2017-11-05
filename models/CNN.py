@@ -41,6 +41,8 @@ class CNN(object):
         self.conv1_b = tf.get_variable("conv1_b", [32], tf.float32,
                                        initializer=tf.zeros_initializer
                                        )
+        tf.layers.conv2d()
+
         self.h1_conv = self.activate_func(
             self.conv2d(self._input, self.conv1_w) + self.conv1_b, 'hidden1')
         self.h1 = self.max_pool_2x2(self.h1_conv, 'pooling1')

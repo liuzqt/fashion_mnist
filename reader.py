@@ -77,10 +77,7 @@ class DataSet(object):
         return self.valid_data, self.valid_label
 
     def test_batch(self):
-        for i in range(0, self.test_size, self.batch_size):
-            data = self.test_data[i:i + self.batch_size]
-            label = self.test_label[i:i + self.batch_size]
-            yield data, label
+        return self.test_data, self.test_label
 
 
 def read_dataset(batch_size=50, valid_size=1000):

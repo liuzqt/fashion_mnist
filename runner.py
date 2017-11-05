@@ -27,17 +27,17 @@ class Runner(object):
         self.dataset = read_dataset(config.batch_size)
         self.graph = tf.Graph()
         self.model = None
+        self.restore = False
         if not os.path.exists(self.config.model_path):
             os.mkdir(self.config.model_path)
         for key in config.__dict__:
             print(key, config.__dict__[key])
         with self.graph.as_default():
             self.model = CNN(self.config)
-            tf.Graph.finalize(self.graph)
 
     def run(self):
         with self.graph.as_default(), tf.Session() as sess:
-
+            self.restore = True
             model_path = os.path.join(self.config.model_path,
                                       self.config.model_name)
             saver = tf.train.Saver()
@@ -83,20 +83,25 @@ class Runner(object):
             print(
                 'training finished,  the model will be save in %s' % (
                     self.config.model_path))
-            self.test()
 
     def test(self):
         with self.graph.as_default(), tf.Session() as sess:
             files = glob(os.path.join(self.config.model_path, '*.ckpt.*'))
             assert len(files) > 0
-
-            self.model = CNN(self.config)
-            saver = tf.train.Saver()
-            saver.restore(sess, os.path.join(self.config.model_path,
-                                             self.config.model_name))
-            print(('Model restored from:' + self.config.model_path))
+            if not self.restore:
+                saver = tf.train.Saver()
+                saver.restore(sess, os.path.join(self.config.model_path,
+                                                 self.config.model_name))
+                print(('Model restored from:' + self.config.model_path))
+            test_data, test_label = self.dataset.test_batch()
+            accu,sf = sess.run([self.model.accuracy,self.model.softmax],
+                            feed_dict={self.model.input: test_data,
+                                       self.model.label: test_label})
+            print(len(sf))
+            print('test accuracy:%f' % accu)
 
 
 if __name__ == '__main__':
     runner = Runner(get_config())
     runner.run()
+    runner.test()

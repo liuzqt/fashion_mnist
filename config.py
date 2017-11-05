@@ -25,7 +25,7 @@ class Config(object):
         self.max_epoch = 10
         self.valid_step = 600
         self.initializer = 'normal'
-        self.activate_func = 'relu' # sigmoid or relu
+        self.activate_func = 'tanh' # sigmoid or relu
 
         self.dropout = True
         self.keep_prob = 0.6
