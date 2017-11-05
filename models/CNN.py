@@ -41,7 +41,9 @@ class CNN(object):
         self.conv1_b = tf.get_variable("conv1_b", [32], tf.float32,
                                        initializer=tf.zeros_initializer
                                        )
-        tf.layers.conv2d()
+        # tf.layers.conv2d(inputs=self._input, filters=32, kernel_size=[5, 5],
+        #                  strides=(1, 1), padding='SAME', use_bias=True,
+        #                  kernel_initializer=self.initializer)
 
         self.h1_conv = self.activate_func(
             self.conv2d(self._input, self.conv1_w) + self.conv1_b, 'hidden1')
@@ -64,8 +66,9 @@ class CNN(object):
                                      self.initializer)
         self.fc1_b = tf.get_variable('fc1_b', [1024], tf.float32,
                                      tf.zeros_initializer)
-        self.fc1 = self.activate_func(tf.matmul(self.flatten, self.fc1_w) + self.fc1_b,
-                              'fc1')
+        self.fc1 = self.activate_func(
+            tf.matmul(self.flatten, self.fc1_w) + self.fc1_b,
+            'fc1')
 
         # dropout
         if config.dropout:
@@ -78,8 +81,9 @@ class CNN(object):
                                      self.initializer)
         self.fc2_b = tf.get_variable('fc2_b', [10], tf.float32,
                                      tf.zeros_initializer)
-        self.fc2 = self.activate_func(tf.matmul(self.fc1, self.fc2_w) + self.fc2_b,
-                              'fc2')
+        self.fc2 = self.activate_func(
+            tf.matmul(self.fc1, self.fc2_w) + self.fc2_b,
+            'fc2')
         self.softmax = tf.nn.softmax(logits=self.fc2, name='softmax')
 
         self.accuracy = tf.reduce_mean(tf.cast(
