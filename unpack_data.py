@@ -72,7 +72,7 @@ def decode_idx1_ubyte(idx1_ubyte_file):
     return labels.astype(np.uint8)
 
 
-def run():
+def unpack_data():
     train_images = decode_idx3_ubyte(train_images_idx3_ubyte_file)
     train_labels = decode_idx1_ubyte(train_labels_idx1_ubyte_file)
     test_images = decode_idx3_ubyte(test_images_idx3_ubyte_file)
@@ -90,4 +90,4 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    unpack_data()

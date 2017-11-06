@@ -14,7 +14,7 @@
 import tensorflow as tf
 
 
-class LeNet5(object):
+class ResNet(object):
     def __init__(self, config):
         self.config = config
         # collect layers to calculate MI

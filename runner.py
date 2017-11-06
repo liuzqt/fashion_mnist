@@ -13,6 +13,7 @@
 '''
 from reader import read_dataset
 from models.LeNet5 import LeNet5
+from models.ResNet import ResNet
 import tensorflow as tf
 from glob import glob
 import os
@@ -22,11 +23,11 @@ from config import get_config
 from entropy import entropy
 from plot import plot_info_plain
 import pickle
-import numpy as np
+
 
 
 class Runner(object):
-    def __init__(self, config):
+    def __init__(self, config, model):
         self.config = config
         self.dataset = read_dataset(config.batch_size, config.valid_size,
                                     config.sample_size)
@@ -38,7 +39,7 @@ class Runner(object):
         for key in config.__dict__:
             print(key, config.__dict__[key])
         with self.graph.as_default():
-            self.model = LeNet5(self.config)
+            self.model = model(self.config)
 
         self.IXT = []
         self.ITY = []
@@ -92,8 +93,6 @@ class Runner(object):
                                       feed_dict={self.model.input: sample_data
                                                  })
                     ixt, ity = entropy(layers)
-                    with open('layers.pkl', 'wb') as f:
-                        pickle.dump(layers, f)
 
                     self.IXT.append(ixt)
                     self.ITY.append(ity)
@@ -131,6 +130,6 @@ class Runner(object):
 
 
 if __name__ == '__main__':
-    runner = Runner(get_config())
+    runner = Runner(get_config(), LeNet5)
     runner.run()
     # runner.test()
