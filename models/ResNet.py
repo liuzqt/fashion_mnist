@@ -91,6 +91,8 @@ class LeNet5(object):
         self.layers_collector.append(tf.expand_dims(self.fc1, 1))
         self.layers_collector.append(self.softmax)
 
+    def res_block(self,input):
+
     def transpose(self, layer):
         return tf.transpose(layer, [0, 3, 1, 2])
 

@@ -16,7 +16,7 @@
 import numpy as np
 
 img_bins = np.arange(0, 256)
-hidden_bins = np.arange(0, 30)
+hidden_bins = np.arange(1, 31)
 digitize_bins = np.linspace(-1, 1, 30)
 
 
@@ -62,3 +62,5 @@ def _get_entropy(band, bins):
 
 def _entropy(probs):
     return -(np.log2(probs) * probs).sum()
+
+# im = imread('ex.jpg',as_grey=True)

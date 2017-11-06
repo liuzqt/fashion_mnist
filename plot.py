@@ -12,8 +12,11 @@
 @desc:
 '''
 
-import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.use('Agg')
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def create_color_bar(f, cmap, max_epochs, title='Epochs'):
@@ -51,7 +54,8 @@ def plot_info_plain(IXT, ITY):
     plt.xlabel("I(X;T)")
     plt.ylabel("I(T;Y)")
     create_color_bar(f, cmap, len(IXT))
-    plt.show()
+    # plt.show()
     plt.savefig('./fig.png')
+
 
 plot_info_plain(np.asarray([[1, 2, 4, 8, 16]]), np.asarray([[2, 3, 4, 5, 6]]))

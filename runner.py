@@ -21,6 +21,8 @@ import signal
 from config import get_config
 from entropy import entropy
 from plot import plot_info_plain
+import pickle
+import numpy as np
 
 
 class Runner(object):
@@ -84,11 +86,15 @@ class Runner(object):
                     print('step %d, epoch %d, valid accuracy: %f' % (
                         step, self.dataset.epoch, accu))
                 if step % self.config.info_plane_interval == 0:
+                    print('flag')
                     sample_data = self.dataset.sample_batch()
                     layers = sess.run(self.model.layers_collector,
                                       feed_dict={self.model.input: sample_data
                                                  })
                     ixt, ity = entropy(layers)
+                    with open('layers.pkl', 'wb') as f:
+                        pickle.dump(layers, f)
+
                     self.IXT.append(ixt)
                     self.ITY.append(ity)
 
@@ -109,6 +115,10 @@ class Runner(object):
             self._test(sess)
 
     def plot_info_plane(self):
+        with open('ixt', 'wb') as f:
+            pickle.dump(self.IXT, f)
+        with open('ity', 'wb') as f:
+            pickle.dump(self.ITY, f)
         plot_info_plain(self.IXT, self.ITY)
 
     def _test(self, sess):
@@ -122,4 +132,5 @@ class Runner(object):
 if __name__ == '__main__':
     runner = Runner(get_config())
     runner.run()
+    runner.plot_info_plane()
     # runner.test()

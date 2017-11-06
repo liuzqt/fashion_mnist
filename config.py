@@ -30,13 +30,18 @@ class Config(object):
         self.dropout = True
         self.keep_prob = 0.6
 
+        self.batch_norm = True
+
+        self.l2_norm = False
+        self.l2_beta = 0.01
+
         self.use_lr_decay = True
         self.lr_decay = 0.85
         self.decay_step = 1200
 
         # sample size for calculating information entropy
         self.sample_size = 2000
-        self.info_plane_interval = 1200 # in step
+        self.info_plane_interval = 1200  # in step
 
         self.model_path = './trained_model/'
         self.model_name = 'latest.ckpt'
