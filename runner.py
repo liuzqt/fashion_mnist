@@ -12,19 +12,22 @@
 @desc:
 '''
 from reader import read_dataset
-from models.CNN import CNN
+from models.LeNet5 import LeNet5
 import tensorflow as tf
 from glob import glob
 import os
 import sys
 import signal
 from config import get_config
+from entropy import entropy
+from plot import plot_info_plain
 
 
 class Runner(object):
     def __init__(self, config):
         self.config = config
-        self.dataset = read_dataset(config.batch_size)
+        self.dataset = read_dataset(config.batch_size, config.valid_size,
+                                    config.sample_size)
         self.graph = tf.Graph()
         self.model = None
         self.restore = False
@@ -33,7 +36,10 @@ class Runner(object):
         for key in config.__dict__:
             print(key, config.__dict__[key])
         with self.graph.as_default():
-            self.model = CNN(self.config)
+            self.model = LeNet5(self.config)
+
+        self.IXT = []
+        self.ITY = []
 
     def run(self):
         with self.graph.as_default(), tf.Session() as sess:
@@ -64,20 +70,28 @@ class Runner(object):
 
             while self.dataset.epoch < self.config.max_epoch:
                 data, label = self.dataset.next_training_batch()
-                _, step, loss = sess.run(
+                _, step, loss, layers = sess.run(
                     [self.model.train_op, self.model.global_step,
-                     self.model.loss],
+                     self.model.loss, self.model.layers_collector],
                     feed_dict={self.model.input: data,
                                self.model.label: label})
-                if step % 50 == 0:
-                    print('step %d, epoch %d, loss %f' % (
-                        step, self.dataset.epoch, loss))
-                if (step) % self.config.valid_step == 0:
+
+                if step % self.config.valid_step == 0:
                     valid_data, valid_label = self.dataset.valid_batch()
                     accu = sess.run(self.model.accuracy,
                                     feed_dict={self.model.input: valid_data,
                                                self.model.label: valid_label})
-                    print('valid accuracy: %f' % accu)
+                    print('step %d, epoch %d, valid accuracy: %f' % (
+                        step, self.dataset.epoch, accu))
+                if step % self.config.info_plane_interval == 0:
+                    sample_data = self.dataset.sample_batch()
+                    layers = sess.run(self.model.layers_collector,
+                                      feed_dict={self.model.input: sample_data
+                                                 })
+                    ixt, ity = entropy(layers)
+                    self.IXT.append(ixt)
+                    self.ITY.append(ity)
+
             self._test(sess)
             saver.save(sess, save_path=model_path)
             print(
@@ -93,6 +107,9 @@ class Runner(object):
                                              self.config.model_name))
             print(('Model restored from:' + self.config.model_path))
             self._test(sess)
+
+    def plot_info_plane(self):
+        plot_info_plain(self.IXT, self.ITY)
 
     def _test(self, sess):
         test_data, test_label = self.dataset.test_batch()

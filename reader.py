@@ -27,7 +27,13 @@ def one_hot(label, num_classes):
 
 
 class DataSet(object):
-    def __init__(self, batch_size, valid_size):
+    def __init__(self, batch_size, valid_size, sample_size):
+        '''
+        
+        :param batch_size: 
+        :param valid_size: 
+        :param sample_size: sample_size for information plane
+        '''
         self.batch_size = batch_size
         self.num_classes = 10
         self.valid_size = valid_size
@@ -55,11 +61,14 @@ class DataSet(object):
         assert len(self.train_data) % self.batch_size == 0
 
         self._index_range = np.arange(0, len(self.train_data))
-        self.shuffle_index = np.copy(self._index_range)
-        np.random.shuffle(self.shuffle_index)
+        self.shuffle_index = np.random.permutation(self._index_range)
 
         self.epoch = 0
         self.pos = 0
+
+        self.sample_index_for_infoplane = self._index_range[
+            np.random.permutation(self._index_range)[:sample_size]]
+        self.sample_data = self.train_data[self.sample_index_for_infoplane]
 
     def next_training_batch(self):
         data = self.train_data[
@@ -79,6 +88,9 @@ class DataSet(object):
     def test_batch(self):
         return self.test_data, self.test_label
 
+    def sample_batch(self):
+        return self.sample_data
 
-def read_dataset(batch_size=50, valid_size=1000):
-    return DataSet(batch_size, valid_size)
+
+def read_dataset(batch_size, valid_size, sample_size):
+    return DataSet(batch_size, valid_size, sample_size)

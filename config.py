@@ -21,11 +21,11 @@ class Config(object):
     def __init__(self):
         self.batch_size = 50
         self.valid_size = 1000
-        self.learning_rate = 1e-3
+        self.learning_rate = 5e-4
         self.max_epoch = 40
         self.valid_step = 600
-        self.initializer = 'normal'
-        self.activate_func = 'tanh' # sigmoid or relu
+        self.initializer = 'xavier'  # xavier or normal
+        self.activate_func = 'tanh'  # sigmoid or relu or tanh
 
         self.dropout = True
         self.keep_prob = 0.6
@@ -33,6 +33,10 @@ class Config(object):
         self.use_lr_decay = True
         self.lr_decay = 0.85
         self.decay_step = 1200
+
+        # sample size for calculating information entropy
+        self.sample_size = 2000
+        self.info_plane_interval = 1200 # in step
 
         self.model_path = './trained_model/'
         self.model_name = 'latest.ckpt'

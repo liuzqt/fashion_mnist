@@ -5,7 +5,7 @@
 @author: ZiqiLiu
 
 
-@file: CNN.py
+@file: LeNet5.py
 
 @time: 2017/11/3 下午10:39
 
@@ -14,9 +14,12 @@
 import tensorflow as tf
 
 
-class CNN(object):
+class LeNet5(object):
     def __init__(self, config):
         self.config = config
+        # collect layers to calculate MI
+        self.layers_collector = []
+
         if config.initializer == 'xavier':
             self.initializer = tf.contrib.layers.xavier_initializer_conv2d()
         else:
@@ -92,3 +95,12 @@ class CNN(object):
         self.loss = -tf.reduce_sum(self.label * tf.log(self.softmax))
         self.train_op = self.optimizer.minimize(self.loss,
                                                 global_step=self.global_step)
+
+        self.layers_collector.append(self.transpose(self.input))
+        self.layers_collector.append(self.transpose(self.h1))
+        self.layers_collector.append(self.transpose(self.h2))
+        self.layers_collector.append(tf.expand_dims(self.fc1, 1))
+        self.layers_collector.append(self.softmax)
+
+    def transpose(self, layer):
+        return tf.transpose(layer, [0, 3, 1, 2])
