@@ -30,7 +30,7 @@ class Config(object):
         self.dropout = True
         self.keep_prob = 0.6
 
-        self.batch_norm = True
+        self.batch_norm = False
 
         self.l2_norm = False
         self.l2_beta = 0.01

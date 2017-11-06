@@ -113,6 +113,7 @@ class Runner(object):
                                              self.config.model_name))
             print(('Model restored from:' + self.config.model_path))
             self._test(sess)
+            self.plot_info_plane()
 
     def plot_info_plane(self):
         with open('ixt', 'wb') as f:
@@ -132,5 +133,4 @@ class Runner(object):
 if __name__ == '__main__':
     runner = Runner(get_config())
     runner.run()
-    runner.plot_info_plane()
     # runner.test()

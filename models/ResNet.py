@@ -37,19 +37,20 @@ class LeNet5(object):
         self.input = tf.placeholder(tf.float32, [None, 28, 28], name='input')
         self._input = tf.expand_dims(self.input, 3)
         self.label = tf.placeholder(tf.float32, [None, 10], name='label')
+        self.layers_collector.append(self.input)
 
-        # first conv+pooling
-        self.h1_conv = self.conv2d(self._input, 32, [5, 5], name='hidden1')
-        self.h1 = tf.layers.max_pooling2d(self.h1_conv, [2, 2], [2, 2],
-                                          name='pooling1')
+        # first res block
+        self.block1 = self.res_block(self._input, 32)
+        self.pooling1 = tf.layers.max_pooling2d(self.block1, [2, 2], [2, 2],
+                                                name='pooling1')
 
-        # second conv+pooling
-        self.h2_conv = self.conv2d(self.h1, 64, [5, 5], name='hidden2')
-        self.h2 = tf.layers.max_pooling2d(self.h2_conv, [2, 2], [2, 2],
-                                          name='pooling2')
+        # second res block
+        self.block2 = self.res_block(self.block1, 64)
+        self.pooling2 = tf.layers.max_pooling2d(self.block2, [2, 2], [2, 2],
+                                                name='pooling2')
 
         # flatten
-        self.flatten = tf.reshape(self.h2, [-1, 7 * 7 * 64], 'flatten')
+        self.flatten = tf.reshape(self.pooling2, [-1, 7 * 7 * 64], 'flatten')
 
         # fc1
         self.fc1 = tf.layers.dense(self.flatten, 1024, self.activate_func,
@@ -85,25 +86,32 @@ class LeNet5(object):
         self.train_op = self.optimizer.minimize(self.loss,
                                                 global_step=self.global_step)
 
-        self.layers_collector.append(self.input)
-        self.layers_collector.append(self.transpose(self.h1))
-        self.layers_collector.append(self.transpose(self.h2))
         self.layers_collector.append(tf.expand_dims(self.fc1, 1))
         self.layers_collector.append(self.softmax)
 
-    def res_block(self,input):
+    def res_block(self, x, channel):
+        for i in range(3):
+            shortcut = x
+            if i == 1:
+                shortcut = self.conv2d(shortcut, channel, [1, 1])
+
+            x = self.conv2d(x, channel, [3, 3])
+            x += shortcut
+            self.layers_collector.append(x)
+        return x
 
     def transpose(self, layer):
         return tf.transpose(layer, [0, 3, 1, 2])
 
-    def conv2d(self, input, channel, kernel, name):
-        l2_beta = self.config.l2_beta if self.config.l2_norm else 0.
+    def conv2d(self, input, channel, kernel, name=None):
+        l2_regularizer = tf.contrib.layers.l2_regularizer(
+            scale=self.config.l2_beta) if self.config.l2_norm else None
+
         conv = tf.layers.conv2d(input, channel, kernel,
                                 strides=(1, 1), padding='SAME',
                                 use_bias=True,
                                 kernel_initializer=self.initializer,
-                                kernel_regularizer=tf.contrib.layers.l2_regularizer(
-                                    scale=l2_beta))
+                                kernel_regularizer=l2_regularizer)
         if self.config.batch_norm:
             conv = tf.layers.batch_normalization(conv)
         activate = self.activate_func(conv, name)

@@ -94,14 +94,15 @@ class LeNet5(object):
     def transpose(self, layer):
         return tf.transpose(layer, [0, 3, 1, 2])
 
-    def conv2d(self, input, channel, kernel, name):
-        l2_beta = self.config.l2_beta if self.config.l2_norm else 0.
+    def conv2d(self, input, channel, kernel, name=None):
+        l2_regularizer = tf.contrib.layers.l2_regularizer(
+            scale=self.config.l2_beta) if self.config.l2_norm else None
+
         conv = tf.layers.conv2d(input, channel, kernel,
                                 strides=(1, 1), padding='SAME',
                                 use_bias=True,
                                 kernel_initializer=self.initializer,
-                                kernel_regularizer=tf.contrib.layers.l2_regularizer(
-                                    scale=l2_beta))
+                                kernel_regularizer=l2_regularizer)
         if self.config.batch_norm:
             conv = tf.layers.batch_normalization(conv)
         activate = self.activate_func(conv, name)
