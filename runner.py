@@ -25,7 +25,6 @@ from plot import plot_info_plain
 import pickle
 
 
-
 class Runner(object):
     def __init__(self, config, model):
         self.config = config
@@ -71,6 +70,7 @@ class Runner(object):
             signal.signal(signal.SIGINT, handler_stop_signals)
             signal.signal(signal.SIGTERM, handler_stop_signals)
 
+            total_loss = 0
             while self.dataset.epoch < self.config.max_epoch:
                 data, label = self.dataset.next_training_batch()
                 _, step, loss, layers = sess.run(
@@ -78,21 +78,27 @@ class Runner(object):
                      self.model.loss, self.model.layers_collector],
                     feed_dict={self.model.input: data,
                                self.model.label: label})
+                total_loss += loss
 
                 if step % self.config.valid_step == 0:
                     valid_data, valid_label = self.dataset.valid_batch()
                     accu = sess.run(self.model.accuracy,
                                     feed_dict={self.model.input: valid_data,
                                                self.model.label: valid_label})
-                    print('step %d, epoch %d, valid accuracy: %f' % (
-                        step, self.dataset.epoch, accu))
+                    print('step %d, epoch %d, loss %f, valid accuracy: %f' % (
+                        step, self.dataset.epoch,
+                        total_loss / self.config.valid_step, accu))
+                    total_loss = 0
                 if step % self.config.info_plane_interval == 0:
-                    print('flag')
                     sample_data = self.dataset.sample_batch()
                     layers = sess.run(self.model.layers_collector,
                                       feed_dict={self.model.input: sample_data
                                                  })
                     ixt, ity = entropy(layers)
+                    # print(ixt)
+                    # print(ity)
+                    with open('layers.pkl', 'wb') as f:
+                        pickle.dump(layers, f)
 
                     self.IXT.append(ixt)
                     self.ITY.append(ity)

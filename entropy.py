@@ -34,18 +34,15 @@ def entropy(layers):
     for i, layer in enumerate(layers[1:-1]):
         for sample in layer:
             channel_ent = [
-                _get_entropy(np.digitize(channel, digitize_bins), hidden_bins)
-                for
-                channel in
-                sample]
+                _get_entropy(channel, digitize_bins) for channel in sample]
             avg_ent = np.asarray(channel_ent).mean()
             ent[i].append(avg_ent)
     ent = np.asarray(ent)
     IXT = []
     ITY = []
     for layer_ent in ent:
-        IXT.append(layer_ent - input_ent)
-        ITY.append(output_ent - layer_ent)
+        IXT.append(input_ent - layer_ent)
+        ITY.append(layer_ent - output_ent)
     IXT = np.asarray(IXT)
     ITY = np.asarray(ITY)
     IXT = np.mean(IXT, 1)

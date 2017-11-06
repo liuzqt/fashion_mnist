@@ -26,6 +26,7 @@ class Config(object):
         self.valid_step = 600
         self.initializer = 'xavier'  # xavier or normal
         self.activate_func = 'tanh'  # sigmoid or relu or tanh
+        self.optimizer = 'adam'  # sgd adam
 
         self.dropout = True
         self.keep_prob = 0.6

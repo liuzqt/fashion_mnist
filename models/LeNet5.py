@@ -79,7 +79,11 @@ class LeNet5(object):
             initial_learning_rate, self.global_step, self.config.decay_step,
             self.config.lr_decay,
             name='lr') if config.use_lr_decay else initial_learning_rate
-        self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
+        if self.config.optimizer == 'adam':
+            self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
+        else:
+            self.optimizer = tf.train.GradientDescentOptimizer(
+                self.learning_rate)
 
         self.loss = -tf.reduce_sum(self.label * tf.log(self.softmax))
         self.train_op = self.optimizer.minimize(self.loss,

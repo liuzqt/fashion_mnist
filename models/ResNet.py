@@ -45,7 +45,7 @@ class ResNet(object):
                                                 name='pooling1')
 
         # second res block
-        self.block2 = self.res_block(self.block1, 64)
+        self.block2 = self.res_block(self.pooling1, 64)
         self.pooling2 = tf.layers.max_pooling2d(self.block2, [2, 2], [2, 2],
                                                 name='pooling2')
 
@@ -92,12 +92,12 @@ class ResNet(object):
     def res_block(self, x, channel):
         for i in range(3):
             shortcut = x
-            if i == 1:
+            if i == 0:
                 shortcut = self.conv2d(shortcut, channel, [1, 1])
 
             x = self.conv2d(x, channel, [3, 3])
             x += shortcut
-            self.layers_collector.append(x)
+            self.layers_collector.append(self.transpose(x))
         return x
 
     def transpose(self, layer):

@@ -47,6 +47,7 @@ def plot_info_plain(IXT, ITY):
 
     colors = [cmap(i) for i in np.linspace(0, 1, len(IXT))]
     for ixt, ity, color in zip(IXT, ITY, colors):
+        print(ixt,ity)
         assert len(ixt) == len(ity)
         plt.plot(ixt, ity, marker='o', ls='-', markersize=19,
                  markeredgewidth=0.04, linewidth=2.1, color=color)
