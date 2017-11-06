@@ -58,5 +58,3 @@ def plot_info_plain(IXT, ITY):
     # plt.show()
     plt.savefig('./fig.png')
 
-
-plot_info_plain(np.asarray([[1, 2, 4, 8, 16]]), np.asarray([[2, 3, 4, 5, 6]]))
