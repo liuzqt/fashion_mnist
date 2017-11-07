@@ -22,7 +22,7 @@ class Config(object):
         self.batch_size = 50
         self.valid_size = 1000
         self.learning_rate = 5e-4
-        self.max_epoch = 30
+        self.max_epoch = 20
         self.valid_step = 1200
         self.initializer = 'xavier'  # xavier or normal
         self.activate_func = 'tanh'  # sigmoid or relu or tanh

@@ -14,7 +14,7 @@
 
 import matplotlib
 
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -49,12 +49,12 @@ def plot_info_plain(IXT, ITY):
     for ixt, ity, color in zip(IXT, ITY, colors):
         print(ixt,ity)
         assert len(ixt) == len(ity)
-        plt.plot(ixt, ity, marker='o', ls='-', markersize=19,
+        plt.plot(ixt, ity, marker='o', ls='-', markersize=7,
                  markeredgewidth=0.04, linewidth=2.1, color=color)
 
     plt.xlabel("I(X;T)")
     plt.ylabel("I(T;Y)")
     create_color_bar(f, cmap, len(IXT))
-    # plt.show()
+    plt.show()
     plt.savefig('./fig.png')
 

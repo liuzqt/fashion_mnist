@@ -79,7 +79,9 @@ class Runner(object):
                     feed_dict={self.model.input: data,
                                self.model.label: label})
                 total_loss += loss
-
+                # ixt, ity = entropy(layers)
+                # self.IXT.append(ixt)
+                # self.ITY.append(ity)
                 if step % self.config.valid_step == 0:
                     valid_data, valid_label = self.dataset.valid_batch()
                     accu = sess.run(self.model.accuracy,
@@ -89,19 +91,19 @@ class Runner(object):
                         step, self.dataset.epoch,
                         total_loss / self.config.valid_step, accu))
                     total_loss = 0
-                if step % self.config.info_plane_interval == 0:
-                    sample_data = self.dataset.sample_batch()
-                    layers = sess.run(self.model.layers_collector,
-                                      feed_dict={self.model.input: sample_data
-                                                 })
-                    ixt, ity = entropy(layers)
-                    # print(ixt)
-                    # print(ity)
-                    with open('layers.pkl', 'wb') as f:
-                        pickle.dump(layers, f)
-
-                    self.IXT.append(ixt)
-                    self.ITY.append(ity)
+                # if step % self.config.info_plane_interval == 0:
+                #     sample_data = self.dataset.sample_batch()
+                #     layers = sess.run(self.model.layers_collector,
+                #                       feed_dict={self.model.input: sample_data
+                #                                  })
+                #     ixt, ity = entropy(layers)
+                #     # print(ixt)
+                #     # print(ity)
+                #     with open('layers.pkl', 'wb') as f:
+                #         pickle.dump(layers, f)
+                #
+                #     self.IXT.append(ixt)
+                #     self.ITY.append(ity)
 
             self._test(sess)
             saver.save(sess, save_path=model_path)
@@ -118,7 +120,6 @@ class Runner(object):
                                              self.config.model_name))
             print(('Model restored from:' + self.config.model_path))
             self._test(sess)
-            self.plot_info_plane()
 
     def plot_info_plane(self):
         with open('ixt', 'wb') as f:
@@ -136,6 +137,18 @@ class Runner(object):
 
 
 if __name__ == '__main__':
-    runner = Runner(get_config(), LeNet5)
-    runner.run()
-    # runner.test()
+
+    model = None
+    if len(sys.argv) > 1:
+        if sys.argv[1] == 'LeNet5':
+            print("Using LetNet5")
+            model = LeNet5
+        elif sys.argv[1] == 'miniResNet':
+            print("Using miniResNet")
+            model = ResNet
+    if model:
+        runner = Runner(get_config(), model)
+        runner.run()
+    else:
+        print('model not defined!')
+        sys.exit(1)
